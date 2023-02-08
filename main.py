@@ -1,7 +1,6 @@
 import json
-from urllib import request
 
-from flask import Flask
+from flask import Flask, request
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy.orm import relationship
 
@@ -26,7 +25,7 @@ db = SQLAlchemy(app)
 # app.register_blueprint(offers_blueprint, url_prefix='/offers')
 
 def get_response(data: dict) -> json:
-    return json.dumps(data), 200, {'Content-Type':'application/json; charset=utf-8'}
+    return json.dumps(data), 200, {'Content-Type': 'application/json; charset=utf-8'}
 
 
 class User(db.Model):
@@ -40,7 +39,7 @@ class User(db.Model):
     phone = db.Column(db.String)
 
     def to_dict(self):
-        return {col.name: getattr(self, col.name) for col in self.__tablename__}
+        return {col.name: getattr(self, col.name) for col in self.__table__.columns}
 
 
 class Offer(db.Model):
@@ -52,8 +51,10 @@ class Offer(db.Model):
 
     executor_id = db.Column(db.Integer, db.ForeignKey('user.id'))
     user = relationship("User")
+
     def to_dict(self):
-        return {col.name: getattr(self, col.name) for col in self.__tablename__}
+        return {col.name: getattr(self, col.name) for col in self.__table__.columns}
+
 
 class Order(db.Model):
     __tablename__ = 'order'
@@ -72,29 +73,28 @@ class Order(db.Model):
     user = relationship("User")
 
     def to_dict(self):
-        return {col.name: getattr(self, col.name) for col in self.__tablename__}
+        return {col.name: getattr(self, col.name) for col in self.__table__.columns}
 
 
-# with app.app_context():
-#     db.create_all()
+with app.app_context():
+    db.create_all()
 
-
-# with app.app_context():
-#     for user in users_list():
-#         user_ = User(id=user['id'], first_name=user['first_name'], last_name=user['last_name'], age=user['age'],
-#                      email=user['email'], role=user['role'], phone=user['phone'])
-#         db.session.add(user_)
-#     db.session.commit()
-#     for offer in offers_list():
-#         offer_ = Offer(id=offer['id'], order_id=offer['order_id'], executor_id=offer['executor_id'])
-#         db.session.add(offer_)
-#     db.session.commit()
-#     for order in orders_list():
-#         order_ = Order(id=order['id'], name=order['name'], description=order['description'],
-#                        start_date=order['start_date'], end_date=order['end_date'], address=order['address'],
-#                        price=order['price'], customer_id=order['customer_id'], executor_id=order['executor_id'], )
-#         db.session.add(order_)
-#     db.session.commit()
+with app.app_context():
+    for user in users_list():
+        user_ = User(id=user['id'], first_name=user['first_name'], last_name=user['last_name'], age=user['age'],
+                     email=user['email'], role=user['role'], phone=user['phone'])
+        db.session.add(user_)
+    db.session.commit()
+    for offer in offers_list():
+        offer_ = Offer(id=offer['id'], order_id=offer['order_id'], executor_id=offer['executor_id'])
+        db.session.add(offer_)
+    db.session.commit()
+    for order in orders_list():
+        order_ = Order(id=order['id'], name=order['name'], description=order['description'],
+                       start_date=order['start_date'], end_date=order['end_date'], address=order['address'],
+                       price=order['price'], customer_id=order['customer_id'], executor_id=order['executor_id'], )
+        db.session.add(order_)
+    db.session.commit()
 
 
 @app.route("/users", methods=['GET', 'POST'])
@@ -128,7 +128,7 @@ def one_user(id: int):
         user.age = user_data['age']
         db.session.add(user)
         db.session.commit()
-        return '',204
+        return '', 204
 
 
 @app.route("/orders", methods=['GET', 'POST'])
@@ -164,7 +164,8 @@ def one_order(id):
         order.executor_id = order_data['executor_id']
         db.session.add(order)
         db.session.commit()
-        return '',204
+        return '', 204
+
 
 @app.route("/offers", methods=['GET', 'POST'])
 def all_offers():
