@@ -104,7 +104,7 @@ def all_users():
         user_res = [users.to_dict() for users in users]
         return get_response(user_res)
     elif request.method == 'POST':
-        user_data = json.load(request.data)
+        user_data = json.loads(request.data)
         db.session.add(User(**user_data))
         db.session.commit()
         return '', 201
@@ -118,6 +118,7 @@ def one_user(id: int):
     if request.method == 'DELETE':
         db.session.delete(user)
         db.session.commit()
+        return '', 201
     if request.method == 'PUT':
         user_data = json.loads(request.data)
         user.first_name = user_data['first_name']
@@ -138,7 +139,7 @@ def all_orders():
         orders_res = [orders.to_dict() for orders in orders]
         return get_response(orders_res)
     elif request.method == 'POST':
-        user_data = json.load(request.data)
+        user_data = json.loads(request.data)
         db.session.add(Order(**user_data))
         db.session.commit()
         return '', 201
@@ -152,6 +153,7 @@ def one_order(id):
     if request.method == 'DELETE':
         db.session.delete(order)
         db.session.commit()
+        return '', 201
     if request.method == 'PUT':
         order_data = json.loads(request.data)
         order.name = order_data['name']
@@ -174,7 +176,7 @@ def all_offers():
         offer_res = [offers.to_dict() for offers in offers]
         return get_response(offer_res)
     elif request.method == 'POST':
-        user_data = json.load(request.data)
+        user_data = json.loads(request.data)
         db.session.add(Offer(**user_data))
         db.session.commit()
         return '', 201
@@ -188,6 +190,7 @@ def one_offer(id):
     if request.method == 'DELETE':
         db.session.delete(offer)
         db.session.commit()
+        return '', 201
     if request.method == 'PUT':
         offer_data = json.loads(request.data)
         offer.order_id = offer_data['order_id']
